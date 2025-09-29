@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wanderlust Travels - Explore the World</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/69/69906.png">
+    <style>
+        :root {
+            --nav-height: 70px; /* Define nav height for calculations */
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fafc;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(rgba(30, 58, 138, 0.7), rgba(59, 130, 246, 0.7)), 
+                        url('https://images.unsplash.com/photo-1488646953014-85cb44e25828') center/cover no-repeat fixed;
+            color: white;
+            padding: 0 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            height: var(--nav-height);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .logo::before {
+            content: "✈️";
+            font-size: 1.5rem;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+        nav a {
+            color: rgb(242, 255, 61);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        nav a:hover,
+        nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Mobile Navigation Toggle (Hamburger) */
+        .nav-toggle {
+            display: none; /* Hidden by default on desktop */
+            cursor: pointer;
+            color: yellow;
+            background: transparent;
+            border: 0;
+            padding: 0.5em;
+            z-index: 1100;
+        }
+        .hamburger {
+            display: block;
+            position: relative;
+            width: 2em;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: transform 250ms ease-in-out;
+        }
+        .hamburger::before,
+        .hamburger::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: transform 250ms ease-in-out, opacity 250ms linear;
+        }
+        .hamburger::before { top: -8px; }
+        .hamburger::after { bottom: -8px; }
+
+        /* Hamburger animation when nav is open */
+        .nav-open .hamburger {
+            transform: rotate(0.625turn);
+        }
+        .nav-open .hamburger::before {
+            transform: rotate(90deg) translateX(-8px);
+        }
+        .nav-open .hamburger::after {
+            opacity: 0;
+        }
+        
+        /* Main Content Styles */
+        main {
+            flex: 1;
+        }
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Container and Section Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 4rem;
+            color: #1e3a8a;
+            position: relative;
+            font-weight: 700;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover no-repeat;
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        .hero-content { max-width: 800px; padding: 0 2rem; }
+        .hero-content h1 { font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: 1.5rem; text-shadow: 3px 3px 6px rgba(0,0,0,0.7); }
+        .hero-content p { font-size: clamp(1.1rem, 2.5vw, 1.4rem); margin-bottom: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
+        .cta-button {
+            background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 1.2rem 3rem; border: none;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: all 0.4s ease;
+            text-decoration: none; display: inline-block; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+        .cta-button:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 35px rgba(245, 158, 11, 0.5); }
+
+        /* Destinations Section */
+        .destinations { padding: 6rem 0; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
+        .destinations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 3rem; }
+        .destination-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: all 0.4s ease; }
+        .destination-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .destination-image { width: 100%; height: 250px; position: relative; overflow: hidden; }
+        .destination-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .destination-card:hover .destination-image img { transform: scale(1.1); }
+        .destination-content { padding: 2rem; }
+        .destination-content h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #1e3a8a; }
+        .destination-content p { color: #64748b; line-height: 1.7; font-size: 1.05rem; }
+
+        /* About Page */
+        .about-hero {
+            background: linear-gradient(rgba(30, 58, 138, 0.8), rgba(59, 130, 246, 0.8)),
+                        url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') center/cover no-repeat;
+            height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white;
+        }
+        .about-content { padding: 6rem 0; background: #f8fafc; }
+        .about-intro { font-size: 1.2rem; text-align: center; margin-bottom: 4rem; color: #64748b; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.8; }
+        .about-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3rem; }
+        .about-section { background: white; padding: 2.5rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); transition: all 0.3s ease; }
+        .about-section-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
+        .about-section:nth-child(1) .about-section-icon::before { content: '🌍'; }
+        .about-section:nth-child(2) .about-section-icon::before { content: '🎯'; }
+        .about-section:nth-child(3) .about-section-icon::before { content: '⭐'; }
+
+        /* Contact Page */
+        .contact-content { padding: 6rem 0; background: #f8fafc; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+        .contact-form, .contact-info { background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.9rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem;
+            transition: all 0.3s ease; font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .form-group textarea { height: 140px; resize: vertical; }
+        .radio-group { display: flex; gap: 1.5rem; margin-top: 0.5rem; }
+        .radio-group label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal; margin-bottom: 0; }
+        .submit-btn {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 1rem 2.5rem; border: none;
+            border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.4s ease; width: 100%;
+        }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(30, 58, 138, 0.4); }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white; text-align: center; padding: 3rem 0; margin-top: 4rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 1s ease forwards; }
+
+        /* ======== MOBILE RESPONSIVENESS ======== */
+        @media (max-width: 768px) {
+            .nav-toggle {
+                display: block; /* Show hamburger on mobile */
+            }
+
+            nav {
+                position: absolute;
+                background: rgba(30, 58, 138, 0.95);
+                backdrop-filter: blur(15px);
+                left: 0;
+                right: 0;
+                top: var(--nav-height);
+                transform: scale(1, 0); /* Hide by scaling vertically */
+                transform-origin: top;
+                transition: transform 400ms ease-in-out;
+                z-index: 900;
+            }
+
+            .nav-open nav {
+                transform: scale(1, 1); /* Show nav when open */
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+            }
+            
+            nav a {
+                display: block;
+                text-align: center;
+                padding: 1rem;
+                font-size: 1.2rem;
+                border-radius: 0;
+            }
+
+            nav a:hover, nav a.active {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(0);
+                box-shadow: none;
+            }
+
+            .container { padding: 0 1rem; }
+            .hero { height: 70vh; }
+            .hero-content h1 { font-size: 2.2rem; }
+            .hero-content p { font-size: 1.1rem; }
+            
+            .destinations, .about-content, .contact-content { padding: 4rem 0; }
+            .destinations-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .about-sections { grid-template-columns: 1fr; gap: 2rem; }
+            .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .contact-form, .contact-info { padding: 2rem; }
+            .section-title { font-size: 2rem; margin-bottom: 3rem; }
+            footer { margin-top: 2rem; }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">Wanderlust Travels</div>
+            <button class="nav-toggle" aria-label="toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="about">About</a></li>
+                    <li><a href="#" class="nav-link" data-page="contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div id="home" class="page active">
+            <section class="hero">
+                <div class="hero-content fade-in">
+                    <h1>Discover Amazing Destinations</h1>
+                    <p>Your Gateway to Unforgettable Adventures Around the World</p>
+                    <a href="#" class="cta-button" onclick="showPage('about')">Explore More</a>
+                </div>
+            </section>
+            <section class="destinations">
+                <div class="container">
+                    <h2 class="section-title">Featured Destinations</h2>
+                    <div class="destinations-grid">
+                        <article class="destination-card">
+                            <div class="destination-image"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4" alt="Swiss Alps"></div>
+                            <div class="destination-content"><h3>Swiss Alps</h3><p>Experience breathtaking mountain views, pristine snow-capped peaks, and world-class skiing.</p></div>
+                        </article>
+                        <article class="destination-card">
+                            <div class="destination-image"><img src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd" alt="Maldives"></div>
+                            <div class="destination-content"><h3>Maldives Paradise</h3><p>Indulge in crystal-clear turquoise waters, pristine white sand beaches, and luxury overwater bungalows.</p></div>
+                        </article>
+                        <article class="destination-card">
+                            <div class="destination-image"><img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" alt="Japan"></div>
+                            <div class="destination-content"><h3>Japan Heritage</h3><p>Immerse yourself in ancient traditions, stunning temples, and modern culture from Tokyo to Kyoto.</p></div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="about" class="page">
+            <section class="about-hero">
+                <div class="container"><h1>About Wanderlust Travels</h1><p>Connecting You to the World's Most Amazing Places</p></div>
+            </section>
+            <section class="about-content">
+                <div class="container">
+                    <div class="about-intro"><p>At Wanderlust Travels, we believe every journey should be extraordinary. Our passion for exploration drives us to curate the most amazing destinations for fellow adventurers.</p></div>
+                    <div class="about-sections">
+                        <div class="about-section"><div class="about-section-icon"></div><h3>Our Mission</h3><p>To inspire and enable travelers to explore the world's most beautiful and culturally rich destinations.</p></div>
+                        <div class="about-section"><div class="about-section-icon"></div><h3>Our Vision</h3><p>To become the leading platform for conscious travelers who seek authentic experiences and promote sustainable tourism.</p></div>
+                        <div class="about-section"><div class="about-section-icon"></div><h3>Why Choose Us</h3><p>Our expert team carefully selects destinations that offer unique experiences, cultural immersion, and natural beauty.</p></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="contact" class="page">
+            <section class="contact-content">
+                <div class="container">
+                    <h1 class="section-title">Contact Us</h1>
+                    <div class="contact-grid">
+                        <div class="contact-form">
+                            <h2>Get In Touch</h2>
+                            <form id="contactForm" action="https://formspree.io/f/YOUR_UNIQUE_ID" method="POST">
+                                <div class="form-group"><label for="name">Full Name *</label><input type="text" id="name" name="name" required></div>
+                                <div class="form-group"><label for="email">Email Address *</label><input type="email" id="email" name="email" required></div>
+                                <div class="form-group"><label>Gender</label><div class="radio-group"><label><input type="radio" name="gender" value="male"> Male</label><label><input type="radio" name="gender" value="female"> Female</label><label><input type="radio" name="gender" value="other"> Other</label></div></div>
+                                <div class="form-group"><label for="country">Country</label><select id="country" name="country"><option value="">Select your country</option><option value="india">India</option><option value="usa">United States</option><option value="uk">United Kingdom</option><option value="other">Other</option></select></div>
+                                <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" placeholder="Tell us about your travel dreams..."></textarea></div>
+                                <button type="submit" class="submit-btn">Send Message</button>
+                            </form>
+                        </div>
+                        <div class="contact-info">
+                            <h2>Contact Information</h2>
+                            <div class="contact-item"><div class="contact-icon">📧</div><div><strong>Email</strong><br>info@wanderlusttravels.com</div></div>
+                            <div class="contact-item"><div class="contact-icon">📱</div><div><strong>Phone</strong><br>+1 (555) 123-4567</div></div>
+                            <div class="contact-item"><div class="contact-icon">📍</div><div><strong>Address</strong><br>123 Adventure Street, Travel City</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container"><p>&copy; 2025 Wanderlust Travels. All rights reserved.</p></div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const navToggle = document.querySelector('.nav-toggle');
+            const body = document.body;
+
+            // --- Mobile Navigation Toggle ---
+            navToggle.addEventListener('click', () => {
+                body.classList.toggle('nav-open');
+            });
+
+            // --- Page Switching Logic ---
+            function showPage(pageId) {
+                body.classList.remove('nav-open'); // Close nav when a link is clicked
+                
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+                
+                navLinks.forEach(link => link.classList.remove('active'));
+                const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    showPage(pageId);
+                });
+            });
+
+            // Optional: Form submission handling can be added back if you're not using a service like Formspree
+            // For example, showing a custom success message after redirect.
+        });
+    </script>
+</body>
+</html>
